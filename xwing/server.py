@@ -1,4 +1,5 @@
 import time
+import threading
 
 import zmq
 
@@ -12,9 +13,11 @@ INTERVAL_INIT = 1
 INTERVAL_MAX = 32
 
 
-class Server:
+class Server(threading.Thread):
 
     def __init__(self, address, identity):
+        super(Server, self).__init__()
+
         self.address = address
         self.identity = identity
 
@@ -27,7 +30,7 @@ class Server:
     def send(self, frames):
         self._socket.send_multipart(frames)
 
-    def start(self):
+    def run(self):
         self._socket = self._setup()
         self._loop()
 

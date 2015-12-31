@@ -1,5 +1,5 @@
 import uuid
-from Queue import Queue
+from queue import Queue
 
 from stream.task.gateway import Gateway
 from stream.task.executor import Executor
@@ -11,7 +11,7 @@ class Instance:
         self.module = module
         self.klass = klass
         self.manager_address = manager_address
-        self.identity = uuid.uuid1() if identity is None else identity
+        self.identity = str(uuid.uuid1()) if identity is None else identity
 
     def run(self):
         component = make_component(self.module, self.klass)

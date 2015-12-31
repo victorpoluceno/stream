@@ -1,4 +1,4 @@
-from Queue import Queue
+from queue import Empty
 import threading
 
 from xwing.client import Client
@@ -11,19 +11,22 @@ class Gateway(threading.Thread):
         super(Gateway, self).__init__()
         self.manager_address = manager_address
         self.identity = identity
-        self.queue_in, queue_out = queue_in, queue_out
+        self.queue_in, self.queue_out = queue_in, queue_out
 
     def run(self):
-        server = Server(self.manager_address, self.identity)
-
-        while True:
-            value = server.recv()
+        def dispatch(server, message):
+            # FIXME this probabily doesn't work
             self.queue_in.put(value)
 
+        server = Server(self.manager_address, self.identity)
+        server.on_recv(dispatch)
+        server.start()
+
+        while True:
             try:
                 value = self.queue_out.get(block=False)
-            except Queue.Empty:
+            except Empty:
                 continue
 
-            #client = Client('localhost:4444', self.identity)
-            #client.send(b'0', value)
+            # client = Client('localhost:4444', self.identity)
+            # client.send(b'0', value)
